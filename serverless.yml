@@ -1,0 +1,151 @@
+service: url-shortener
+frameworkVersion: "4"
+
+package:
+  individually: true
+  patterns:
+    - "!node_modules/**"
+    - "!.git/**"
+    - "!.gitignore"
+    - "!README.md"
+    - "!.env*"
+    - "!coverage/**"
+    - "!.nyc_output/**"
+    - "!tests/**"
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-1'}
+
+  environment:
+    STAGE: ${self:provider.stage}
+    USER_POOL_CLIENT_ID:
+      Fn::GetAtt:
+        - userPoolClient
+        - ClientId
+    USER_POOL_ID:
+      Ref: userPool
+    DYNAMODB_TABLE: ${self:service}-${self:provider.stage}
+
+  httpApi:
+    metrics: true
+    cors: true
+    authorizers:
+      jwtAuthorizer:
+        identitySource: $request.header.Authorization
+        issuerUrl:
+          Fn::GetAtt:
+            - userPool
+            - ProviderURL
+        audience:
+          - Ref: userPoolClient
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource: "*"
+
+functions:
+  #users
+  signUp:
+    handler: src/routes/user/signup.handler
+    events:
+      - httpApi:
+          method: POST
+          path: /auth/register
+          cors: true
+
+  confirmSignUp:
+    handler: src/routes/user/confirm.handler
+    events:
+      - httpApi:
+          method: POST
+          path: /auth/confirm
+          cors: true
+
+  login:
+    handler: src/routes/user/login.handler
+    events:
+      - httpApi:
+          method: POST
+          path: /auth/login
+          cors: true
+
+  refresh:
+    handler: src/routes/user/refresh.handler
+    events:
+      - httpApi:
+          method: POST
+          path: /auth/refresh
+          cors: true
+
+  #URLs
+  shortenUrl:
+    handler: src/routes/urls/shorten.handler
+    events:
+      - httpApi:
+          path: api/v1/shorten
+          method: POST
+          cors: true
+          authorizer:
+            name: jwtAuthorizer
+
+  redirect:
+    handler: src/routes/urls/redirect.handler
+    events:
+      - http:
+          path: /{shortenedCode}
+          method: GET
+
+  updateFullURL:
+    handler: src/routes/urls/update_url.handler
+    events:
+      - http:
+          path: api/v1/{shortenedCode}
+          method: PATCH
+          cors: true
+          authorizer:
+            name: jwtAuthorizer
+
+  getUserUrls:
+    handler: src/routes/urls/user.handler
+    events:
+      - http:
+          path: api/v1/user/{userId}
+          method: get
+          cors: true
+          authorizer:
+            name: jwtAuthorizer
+
+  deleteUrl:
+    handler: src/routes/urls/delete.handler
+    events:
+      - http:
+          path: api/v1/{shortenedCode}
+          method: DELETE
+          cors: true
+          authorizer:
+            name: jwtAuthorizer
+
+  #Analytics
+
+  getAnalytics:
+    handler: src/routes/analytics/get_analytics.handler
+    events:
+      - http:
+          path: api/v1/analytics/{shortenedCode}
+          method: get
+          cors: true
+          authorizer:
+            name: jwtAuthorizer
+
+resources: ${file(resources.yml)}

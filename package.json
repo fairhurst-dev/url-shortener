@@ -1,0 +1,33 @@
+{
+  "name": "url-shortener",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest"
+  },
+  "imports": {
+    "#*": "./src/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fairhurst-dev/url-shortener.git"
+  },
+  "author": "fairhurst.dev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fairhurst-dev/url-shortener/issues"
+  },
+  "homepage": "https://github.com/fairhurst-dev/url-shortener#readme",
+  "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.835.0",
+    "@middy/core": "^6.3.2",
+    "@middy/http-error-handler": "^6.3.2",
+    "@middy/http-json-body-parser": "^6.3.2",
+    "ramda": "^0.31.3",
+    "serverless": "^4.17.1"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.4"
+  }
+}

@@ -1,0 +1,103 @@
+Resources:
+  userPool:
+  Type: AWS::Cognito::UserPool
+  Properties:
+    UserPoolName: ${self:service}-${sls:stage}-user-pool
+    UsernameAttributes:
+      - email
+    AutoVerifiedAttributes:
+      - email
+    Policies:
+      PasswordPolicy:
+        MinimumLength: 8
+        RequireLowercase: true
+        RequireNumbers: true
+        RequireSymbols: true
+        RequireUppercase: true
+    Schema:
+      - Name: email
+        Required: true
+        Mutable: true
+    MfaConfiguration: OFF
+    EmailVerificationMessage: "Your verification code is {####}"
+    EmailVerificationSubject: "Verify your email"
+    AdminCreateUserConfig:
+      AllowAdminCreateUserOnly: false
+    UsernameConfiguration:
+      CaseSensitive: false
+userPoolClient:
+  Type: AWS::Cognito::UserPoolClient
+  Properties:
+    ClientName: ${self:service}-${sls:stage}-user-pool-client
+    UserPoolId:
+      Ref: userPool
+    ExplicitAuthFlows:
+      - ALLOW_USER_PASSWORD_AUTH
+      - ALLOW_REFRESH_TOKEN_AUTH
+    GenerateSecret: false
+  UrlsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    Properties:
+      TableName: ${self:provider.environment.DYNAMODB_TABLE}
+      AttributeDefinitions:
+        - AttributeName: PK #shortenedCode
+          AttributeType: S
+        - AttributeName: GSI1PK #Full URL
+          AttributeType: S
+        - AttributeName: GSI2PK #UserId
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: GSI1 #Full URL
+          KeySchema:
+            - AttributeName: GSI1PK
+              KeyType: HASH
+            - AttributeName: PK
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+        - IndexName: GSI2 #User ID
+          KeySchema:
+            - AttributeName: GSI2PK
+              KeyType: HASH
+            - AttributeName: PK
+            - KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+      BillingMode: PAY_PER_REQUEST
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+
+  AnalyticsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    Properties:
+      TableName: ${self:provider.environment.DYNAMODB_TABLE}-analytics
+      AttributeDefinitions:
+        - AttributeName: PK #User ID
+          AttributeType: S
+        - AttributeName: SK #ShortenedCode
+          AttributeType: S
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: GSI1 #Shortened Code
+          KeySchema:
+            - AttributeName: SK
+              KeyType: HASH
+            - AttributeName: PK
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+      BillingMode: PAY_PER_REQUEST
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
