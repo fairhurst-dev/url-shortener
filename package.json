@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "vitest"
+    "test": "vitest run",
+    "watch": "vitest"
   },
   "imports": {
     "#*": "./src/*"
@@ -21,6 +22,9 @@
   "homepage": "https://github.com/fairhurst-dev/url-shortener#readme",
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.835.0",
+    "@aws-sdk/client-dynamodb": "^3.839.0",
+    "@aws-sdk/lib-dynamodb": "^3.839.0",
+    "@googleapis/safebrowsing": "^11.0.1",
     "@middy/core": "^6.3.2",
     "@middy/http-error-handler": "^6.3.2",
     "@middy/http-json-body-parser": "^6.3.2",

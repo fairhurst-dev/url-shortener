@@ -5,21 +5,19 @@ import { userValidator } from "#lib/validators.js";
 import {
   badRequest,
   handleCognitoError,
-  bodyFormatter,
+  successResponse,
 } from "#routes/utils.js";
 
 const signupHandler = async (event) => {
   try {
     const { error, value } = userValidator.validate(event.body);
     if (error) {
-      return badRequest({
-        error,
-      });
+      return badRequest(error);
     }
 
-    const resp = await signup(value);
+    await signup(value);
 
-    return bodyFormatter(resp);
+    return successResponse();
   } catch (error) {
     return handleCognitoError(error);
   }
