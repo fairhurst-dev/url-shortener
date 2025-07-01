@@ -27,7 +27,8 @@ provider:
         - ClientId
     USER_POOL_ID:
       Ref: userPool
-    DYNAMODB_TABLE: ${self:service}-${self:provider.stage}
+    URL_TABLE: ${self:service}-${self:provider.stage}
+    ANALYTICS_TABLE: ${self:service}-${self:provider.stage}-analytics
 
   httpApi:
     metrics: true

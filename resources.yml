@@ -39,7 +39,7 @@ userPoolClient:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Retain
     Properties:
-      TableName: ${self:provider.environment.DYNAMODB_TABLE}
+      TableName: ${self:provider.environment.URL_TABLE}
       AttributeDefinitions:
         - AttributeName: PK #shortenedCode
           AttributeType: S
@@ -77,11 +77,11 @@ userPoolClient:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Retain
     Properties:
-      TableName: ${self:provider.environment.DYNAMODB_TABLE}-analytics
+      TableName: ${self:provider.environment.ANALYTICS_TABLE}
       AttributeDefinitions:
         - AttributeName: PK #User ID
           AttributeType: S
-        - AttributeName: SK #ShortenedCode
+        - AttributeName: SK #ShortenedCode OR #
           AttributeType: S
       KeySchema:
         - AttributeName: PK

@@ -12,9 +12,7 @@ const loginHandler = async (event) => {
   try {
     const { error, value } = userValidator.validate(event.body);
     if (error) {
-      return badRequest({
-        error,
-      });
+      return badRequest(error);
     }
 
     const resp = await login(value);

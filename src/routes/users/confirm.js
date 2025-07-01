@@ -12,9 +12,7 @@ const confirmHandler = async (event) => {
   try {
     const { error, value } = confirmOTPValidator.validate(event.body);
     if (error) {
-      return badRequest({
-        error,
-      });
+      return badRequest(error);
     }
 
     await confirmSignUp(value);

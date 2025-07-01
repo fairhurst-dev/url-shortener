@@ -1,5 +1,10 @@
 import { map, pipe, prop, join, curry } from "ramda";
-import { userSchema, confirmOTPSchema, refreshSchema } from "#lib/schemas.js";
+import {
+  userSchema,
+  confirmOTPSchema,
+  refreshSchema,
+  shortenURLSchema,
+} from "#lib/schemas.js";
 
 const joiDefaults = {
   abortEarly: false,
@@ -22,3 +27,5 @@ export const userValidator = baseValidator(userSchema);
 export const confirmOTPValidator = baseValidator(confirmOTPSchema);
 
 export const refreshValidator = baseValidator(refreshSchema);
+
+export const shortenURLValidator = baseValidator(shortenURLSchema);

@@ -19,3 +19,13 @@ export const refreshSchema = Joi.object({
   refreshToken: Joi.string().required(),
   deviceKey: Joi.string().optional(),
 });
+
+export const shortenURLSchema = Joi.object({
+  fullURL: Joi.string()
+    .uri({
+      scheme: ["https", "http"],
+      allowRelative: false,
+      relativeOnly: false,
+    })
+    .required(),
+});
