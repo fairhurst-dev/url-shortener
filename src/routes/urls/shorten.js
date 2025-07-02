@@ -5,21 +5,21 @@ import {
   badRequest,
   unauthorized,
   tooManyResources,
+  defaultError,
 } from "#routes/utils.js";
 import {
   hasUserReachedRequestLimit,
   hasUserReachedCodeLimit,
   getUserUUID,
-} from "#lib/services/authorizer.js";
+} from "#lib/authorizer.js";
 import { isSafeURL } from "#lib/services/safe_browsing/index.js";
 import { generateShortCode } from "#lib/services/shortener.js";
-import { createShortCode } from "#lib/services/dynamo/index.js";
+import {
+  createShortCode,
+  createAnalyticsEntry,
+} from "#lib/services/dynamo/index.js";
 
 const shorten = async (event) => {
-  //if URL is safe, create a new short URL
-  //save the short URL to the database
-  //return the short URL in the response
-
   try {
     const { error, value } = shortenURLValidator.validate(event.body);
     if (error) {
@@ -68,6 +68,8 @@ const shorten = async (event) => {
 
     if (error.name === "URLSafetyCheckFailedException") {
       return badRequest("This URL is not safe");
+    } else {
+      return defaultError();
     }
   }
 };
