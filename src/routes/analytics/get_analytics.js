@@ -1,13 +1,20 @@
+import { getUserUUID } from "#lib/authorizer.js";
 import { middyfy } from "#lib/middleware.js";
+import { bodyFormatter, handleError } from "#routes/utils.js";
+import { getAnalyticsForUser } from "#lib/services/dynamo/index.js";
 
 const getAnalytics = async (event) => {
-  //validate input
-  //fetch user object from database
-  //if user does not exist, return 401
-  //if user has not reached limit, return 403
-  //if user has not reached limit,
-  //fetch analytics data from database
-  //return analytics data in the response
+  try {
+    const userUUID = getUserUUID(event);
+
+    await hasUserReachedRequestLimit(event);
+
+    const analyticsData = await getAnalyticsForUser(userUUID);
+
+    return bodyFormatter(analyticsData);
+  } catch (error) {
+    return handleError(error);
+  }
 };
 
 export const handler = middyfy(getAnalytics);

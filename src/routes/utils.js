@@ -9,12 +9,31 @@ import {
   pathOr,
 } from "ramda";
 
-export const badRequest = applySpec({
-  statusCode: always(400),
-  body: identity,
-});
-
 const stringify = (input) => JSON.stringify(input);
+
+export const handleError = (error) => {
+  console.error(error);
+  if (error.name === "TooManyRequestsException") {
+    return tooManyRequests();
+  }
+  if (error.name === "UserNotFoundException") {
+    return unauthorized();
+  }
+  if (error.name === "OwnershipCheckFailedException") {
+    return unauthorized();
+  }
+  if (error.name === "TooManyResourcesException") {
+    return tooManyResources();
+  }
+  if (error.name === "URLSafetyCheckFailedException") {
+    return badRequest("This URL is not safe");
+  }
+  if (error.name === "EntryNotFoundException") {
+    return notFound();
+  } else {
+    return defaultError();
+  }
+};
 
 export const bodyFormatter = applySpec({
   statusCode: always(200),
@@ -25,29 +44,34 @@ export const successResponse = applySpec({
   statusCode: always(201),
 });
 
-export const unauthorized = applySpec({
+export const badRequest = applySpec({
+  statusCode: always(400),
+  body: identity,
+});
+
+const unauthorized = applySpec({
   statusCode: always(401),
   body: always("UnauthorizedException"),
 });
 
-export const tooManyResources = applySpec({
+const tooManyResources = applySpec({
   statusCode: always(403),
   body: always("You have reached the limit of 10 short URLs."),
 });
 
-export const notFound = applySpec({
+const notFound = applySpec({
   statusCode: always(404),
   body: always("Not Found"),
 });
 
-export const tooManyRequests = applySpec({
+const tooManyRequests = applySpec({
   statusCode: always(429),
   body: always(
     "You have made too many requests in the last 5 minutes. Please try again later"
   ),
 });
 
-export const defaultError = applySpec({
+const defaultError = applySpec({
   statusCode: always(500),
   body: always("Internal server error"),
 });

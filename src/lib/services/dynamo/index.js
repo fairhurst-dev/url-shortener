@@ -3,11 +3,17 @@ import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
 import {
   makeGetUserInput,
   makeUpsertUserInput,
-  makeURLSforUserInput,
+  makeGetURLSforUserInput,
   makeCreateShortCodeInput,
   makeAnalyticsEntryInput,
-  makeGetFullURLByShortCodeInput,
+  shortCodeAccessor,
   makeIncrementAnalyticsInput,
+  updateFullURLByShortCodeInput,
+  makeCreateUserInput,
+  makeGetCodesForURLInput,
+  makeGetAnalyticsForCodeInput,
+  extractDataFromResponse,
+  makeGetAnalyticsForUserInput,
 } from "./utils.js";
 import { andThen, path, pipe } from "ramda";
 
@@ -26,22 +32,55 @@ export const getUserByUUID = pipe(
   andThen(path(["Item", "data"]))
 );
 
+export const createUser = pipe(makeCreateUserInput, put);
 export const upsertUser = pipe(makeUpsertUserInput, put);
 
 export const getURLSForUser = pipe(
-  makeURLSforUserInput,
+  makeGetURLSforUserInput,
   query,
-  andThen(path(["Items"]))
+  andThen(extractDataFromResponse)
+);
+
+export const getCodesForURL = pipe(
+  makeGetCodesForURLInput,
+  query,
+  andThen(extractDataFromResponse)
 );
 
 export const createShortCode = pipe(makeCreateShortCodeInput, put);
 
+export const getShortCodeEntry = pipe(
+  shortCodeAccessor,
+  get,
+  andThen(path(["Item", "data"]))
+);
+
 export const getFullURLByShortCode = pipe(
-  makeGetFullURLByShortCodeInput,
+  shortCodeAccessor,
   get,
   andThen(path(["Item", "data", "fullURL"]))
+);
+
+export const deleteShortCode = pipe(shortCodeAccessor, remove);
+
+export const updateFullURLByShortCode = pipe(
+  updateFullURLByShortCodeInput,
+  update,
+  andThen(path(["Attributes", "data", "fullURL"]))
 );
 
 export const createAnalyticsEntry = pipe(makeAnalyticsEntryInput, put);
 
 export const incrementAnalytics = pipe(makeIncrementAnalyticsInput, update);
+
+export const getAnalyticsForCode = pipe(
+  makeGetAnalyticsForCodeInput,
+  get,
+  andThen(path(["Item", "data"]))
+);
+
+export const getAnalyticsForUser = pipe(
+  makeGetAnalyticsForUserInput,
+  query,
+  andThen(extractDataFromResponse)
+);
