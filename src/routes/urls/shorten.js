@@ -1,12 +1,7 @@
 import { middyfy } from "#lib/middleware.js";
+import { JSONBodyParser } from "@middy/http-json-body-parser";
 import { shortenURLValidator } from "#lib/validators.js";
-import {
-  tooManyRequests,
-  badRequest,
-  unauthorized,
-  tooManyResources,
-  defaultError,
-} from "#routes/utils.js";
+import { badRequest, bodyFormatter, handleError } from "#routes/utils.js";
 import {
   hasUserReachedRequestLimit,
   hasUserReachedCodeLimit,
@@ -46,32 +41,14 @@ const shorten = async (event) => {
         fullURL: value.fullURL,
       });
 
-      return {
-        statusCode: 200,
-        body: JSON.stringify({
-          shortCode: shortCode,
-          fullURL: value.fullURL,
-        }),
-      };
+      return bodyFormatter({
+        shortCode: shortCode,
+        fullURL: value.fullURL,
+      });
     }
   } catch (error) {
-    if (error.name === "TooManyRequestsException") {
-      return tooManyRequests();
-    }
-    if (error.name === "UserNotFoundException") {
-      return unauthorized();
-    }
-
-    if (error.name === "TooManyResourcesException") {
-      return tooManyResources();
-    }
-
-    if (error.name === "URLSafetyCheckFailedException") {
-      return badRequest("This URL is not safe");
-    } else {
-      return defaultError();
-    }
+    return handleError(error);
   }
 };
 
-export const handler = middyfy(shorten);
+export const handler = middyfy(shorten).use(JSONBodyParser());

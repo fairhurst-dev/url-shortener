@@ -143,7 +143,7 @@ functions:
     handler: src/routes/analytics/get_analytics.handler
     events:
       - http:
-          path: api/v1/analytics/{shortenedCode}
+          path: api/v1/analytics
           method: get
           cors: true
           authorizer:

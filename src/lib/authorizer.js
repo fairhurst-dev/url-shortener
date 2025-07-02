@@ -2,15 +2,20 @@ import {
   getUserByUUID,
   getURLSForUser,
   upsertUser,
+  getShortCodeEntry,
 } from "#lib/services/dynamo/index.js";
+import { ifElse, isNil } from "ramda";
 
-export const getUserUUID = path([
-  "requestContext",
-  "authorizer",
-  "jwt",
-  "claims",
-  "username",
-]);
+export const getUserUUID = pipe(
+  path(["requestContext", "authorizer", "jwt", "claims", "username"]),
+  ifElse(
+    isNil,
+    always(() => {
+      throw new Error("UserNotFoundException");
+    }),
+    identity
+  )
+);
 
 const hasMadeRequestInLast5Minutes = (user) => {
   const now = new Date();
@@ -55,6 +60,19 @@ export const hasUserReachedCodeLimit = async (event) => {
   const urlsForUser = await getURLSForUser(userUUID);
   if (urlsForUser.length >= 10) {
     throw new Error("TooManyResourcesException");
+  }
+  return true;
+};
+
+export const doesUserOwnShortCode = async ({ userUUID, shortCode }) => {
+  const shortCodeEntry = await getShortCodeEntry(shortCode);
+
+  if (!shortCodeEntry) {
+    throw new Error("EntryNotFoundException");
+  }
+
+  if (shortCodeEntry.userUUID !== userUUID) {
+    throw new Error("OwnershipCheckFailedException");
   }
   return true;
 };
