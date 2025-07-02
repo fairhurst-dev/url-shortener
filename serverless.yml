@@ -117,8 +117,8 @@ functions:
           authorizer:
             name: jwtAuthorizer
 
-  getUserUrls:
-    handler: src/routes/urls/user.handler
+  listUserURLs:
+    handler: src/routes/urls/list.handler
     events:
       - http:
           path: api/v1/user/{userId}

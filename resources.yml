@@ -79,9 +79,7 @@ userPoolClient:
     Properties:
       TableName: ${self:provider.environment.ANALYTICS_TABLE}
       AttributeDefinitions:
-        - AttributeName: PK #User ID
-          AttributeType: S
-        - AttributeName: SK #ShortenedCode OR #
+        - AttributeName: PK #ShortCode or #User
           AttributeType: S
       KeySchema:
         - AttributeName: PK
@@ -89,7 +87,7 @@ userPoolClient:
         - AttributeName: SK
           KeyType: RANGE
       GlobalSecondaryIndexes:
-        - IndexName: GSI1 #Shortened Code
+        - IndexName: GSI1 #User
           KeySchema:
             - AttributeName: SK
               KeyType: HASH

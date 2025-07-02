@@ -1,11 +1,28 @@
 import { middyfy } from "#lib/middleware.js";
+import { badRequest, notFound } from "#routes/utils.js";
+import { path } from "ramda";
 
 const redirect = async (event) => {
-  //if no pathParameters, return 400
-  //fetch URL object from DDB
-  //if URL does not exist, return 404
-  //if URL exists, return 301 redirect to the original URL
-  //publish sns event to increment click count
+  const shortCode = path(["pathParameters", "shortCode"], event);
+
+  if (!shortCode) {
+    return badRequest("Missing shortCode");
+  }
+
+  const fullURL = await getFullURLByShortCode(shortCode);
+
+  if (!fullURL) {
+    return notFound();
+  }
+
+  await incrementAnalytics({ shortCode });
+
+  return {
+    statusCode: 302,
+    headers: {
+      Location: fullURL,
+    },
+  };
 };
 
 export const handler = middyfy(redirect);

@@ -25,11 +25,9 @@ export const successResponse = applySpec({
   statusCode: always(201),
 });
 
-export const tooManyRequests = applySpec({
-  statusCode: always(429),
-  body: always(
-    "You have made too many requests in the last 5 minutes. Please try again later"
-  ),
+export const unauthorized = applySpec({
+  statusCode: always(401),
+  body: always("UnauthorizedException"),
 });
 
 export const tooManyResources = applySpec({
@@ -37,9 +35,21 @@ export const tooManyResources = applySpec({
   body: always("You have reached the limit of 10 short URLs."),
 });
 
-export const unauthorized = applySpec({
-  statusCode: always(401),
-  body: always("UnauthorizedException"),
+export const notFound = applySpec({
+  statusCode: always(404),
+  body: always("Not Found"),
+});
+
+export const tooManyRequests = applySpec({
+  statusCode: always(429),
+  body: always(
+    "You have made too many requests in the last 5 minutes. Please try again later"
+  ),
+});
+
+export const defaultError = applySpec({
+  statusCode: always(500),
+  body: always("Internal server error"),
 });
 
 export const handleCognitoError = (error) => {
