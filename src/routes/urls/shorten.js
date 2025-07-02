@@ -27,6 +27,10 @@ const shorten = async (event) => {
     }
     const userUUID = getUserUUID(event);
 
+    if (!userUUID) {
+      return unauthorized();
+    }
+
     await hasUserReachedRequestLimit(event);
     await hasUserReachedCodeLimit(event);
 

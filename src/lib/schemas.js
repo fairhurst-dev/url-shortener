@@ -29,3 +29,11 @@ export const shortenURLSchema = Joi.object({
     })
     .required(),
 });
+
+export const updateURLSchema = shortenURLSchema.keys({
+  shortCode: Joi.string().required(),
+});
+
+export const deleteURLSchema = Joi.object({
+  shortCode: Joi.string().required(),
+});

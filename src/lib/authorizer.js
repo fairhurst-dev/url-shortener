@@ -58,3 +58,13 @@ export const hasUserReachedCodeLimit = async (event) => {
   }
   return true;
 };
+
+export const doesUserOwnShortCode = async ({ userUUID, shortCode }) => {
+  const urlsForUser = await getURLSForUser(userUUID);
+
+  const url = urlsForUser.find((url) => url.shortCode === shortCode);
+  if (!url) {
+    throw new Error("OwnershipCheckFailedException");
+  }
+  return true;
+};

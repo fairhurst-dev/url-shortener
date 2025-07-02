@@ -2,17 +2,12 @@ import {
   always,
   applySpec,
   assocPath,
-  concat,
   converge,
   identity,
   path,
   pipe,
   prop,
 } from "ramda";
-
-//constants
-const USER_PREFIX = "#USER#";
-const ANALYTICS_PREFIX = "#ANALYTICS#";
 
 //helpers
 
@@ -32,25 +27,43 @@ const decorateTTLForDDB = converge(assocPath(["Item", "ttl"]), [
   identity,
 ]);
 
-//keys
-
-const makeUserKey = pipe(prop("userUUID"), concat(USER_PREFIX));
-const makeAnalyticsCodeKey = pipe(prop("shortCode"), concat(ANALYTICS_PREFIX));
-
 //queries
 export const makeGetUserInput = applySpec({
   TableName: always(process.env.ANALYTICS_TABLE),
   Key: {
-    PK: makeUserKey,
+    PK: identity,
   },
 });
 
-export const makeURLSforUserInput = applySpec({
-  TableName: always(process.env.ANALYTICS_TABLE),
-  KeyConditionExpression: "PK = :pk",
-  IndexName: "GSI1",
+export const shortCodeAccessor = applySpec({
+  TableName: always(process.env.URLS_TABLE),
+  Key: {
+    PK: identity,
+  },
+});
+
+export const makeGetURLSforUserInput = applySpec({
+  TableName: always(process.env.URLS_TABLE),
+  KeyConditionExpression: "GSI2PK = :pk",
+  IndexName: always("GSI2"),
   ExpressionAttributeValues: {
-    ":pk": makeUserKey,
+    ":pk": identity,
+  },
+});
+
+export const makeGetAnalyticsForCodeInput = applySpec({
+  TableName: always(process.env.ANALYTICS_TABLE),
+  Key: {
+    PK: identity,
+  },
+});
+
+export const makeGetCodesForURLInput = applySpec({
+  TableName: always(process.env.URLS_TABLE),
+  IndexName: "GSI1",
+  KeyConditionExpression: "GSI1PK = :fullURL",
+  ExpressionAttributeValues: {
+    ":fullURL": identity,
   },
 });
 
@@ -60,8 +73,8 @@ export const makeURLSforUserInput = applySpec({
 export const makeCreateUserInput = applySpec({
   TableName: always(process.env.ANALYTICS_TABLE),
   Item: {
-    PK: makeUserKey,
-    GSI1: makeUserKey,
+    PK: prop("userUUID"),
+    GSI1: always("#"),
     data: {
       userUUID: prop("userUUID"),
       requestsInLast5Minutes: always(0),
@@ -72,8 +85,8 @@ export const makeCreateUserInput = applySpec({
 export const makeUpsertUserInput = applySpec({
   TableName: always(process.env.ANALYTICS_TABLE),
   Item: {
-    PK: makeUserKey,
-    GSI1: makeUserKey,
+    PK: prop("userUUID"),
+    GSI1: always("#"),
     data: {
       userUUID: prop("userUUID"),
       requestsInLast5Minutes: prop("requestsInLast5Minutes"),
@@ -103,21 +116,26 @@ export const makeCreateShortCodeInput = pipe(
   decorateTTLForDDB
 );
 
-export const makeGetFullURLByShortCodeInput = applySpec({
+export const updateFullURLByShortCodeInput = applySpec({
   TableName: always(process.env.URLS_TABLE),
   Key: {
-    PK: identity,
+    PK: prop("shortCode"),
   },
+  UpdateExpression: "SET data.fullURL = :fullURL, GSI1PK = :fullURL",
+  ExpressionAttributeValues: {
+    ":fullURL": prop("fullURL"),
+  },
+  ReturnValues: "ALL_NEW",
+  ConditionExpression: always("attribute_exists(PK)"),
 });
 
 //Analytics
 export const makeAnalyticsEntryInput = applySpec({
   TableName: always(process.env.ANALYTICS_TABLE),
   Item: {
-    PK: makeAnalyticsCodeKey,
-    GSI1: makeUserKey,
+    PK: prop("shortCode"),
+    GSI1: prop("userUUID"),
     data: {
-      fullURL: prop("fullURL"),
       shortCode: prop("shortCode"),
       userUUID: prop("userUUID"),
       totalClicks: always(0),
