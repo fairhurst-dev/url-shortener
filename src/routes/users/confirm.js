@@ -7,6 +7,7 @@ import {
   handleCognitoError,
   successResponse,
 } from "#routes/utils.js";
+import { getUserUUID } from "#lib/authorizer.js";
 
 const confirmHandler = async (event) => {
   try {
@@ -15,7 +16,10 @@ const confirmHandler = async (event) => {
       return badRequest(error);
     }
 
+    const userUUID = getUserUUID(event);
+
     await confirmSignUp(value);
+    await createUser({ userUUID });
 
     return successResponse();
   } catch (error) {

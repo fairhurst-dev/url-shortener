@@ -4,6 +4,7 @@ import {
   confirmOTPSchema,
   refreshSchema,
   shortenURLSchema,
+  updateURLSchema,
 } from "#lib/schemas.js";
 
 const joiDefaults = {
@@ -29,3 +30,5 @@ export const confirmOTPValidator = baseValidator(confirmOTPSchema);
 export const refreshValidator = baseValidator(refreshSchema);
 
 export const shortenURLValidator = baseValidator(shortenURLSchema);
+
+export const updateURLValidator = baseValidator(updateURLSchema);

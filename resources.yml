@@ -54,16 +54,12 @@ userPoolClient:
           KeySchema:
             - AttributeName: GSI1PK
               KeyType: HASH
-            - AttributeName: PK
-              KeyType: RANGE
           Projection:
             ProjectionType: ALL
         - IndexName: GSI2 #User ID
           KeySchema:
             - AttributeName: GSI2PK
               KeyType: HASH
-            - AttributeName: PK
-            - KeyType: RANGE
           Projection:
             ProjectionType: ALL
       BillingMode: PAY_PER_REQUEST
@@ -84,15 +80,11 @@ userPoolClient:
       KeySchema:
         - AttributeName: PK
           KeyType: HASH
-        - AttributeName: SK
-          KeyType: RANGE
       GlobalSecondaryIndexes:
-        - IndexName: GSI1 #User
+        - IndexName: GSI1 #User or #
           KeySchema:
-            - AttributeName: SK
+            - AttributeName: GSI1
               KeyType: HASH
-            - AttributeName: PK
-              KeyType: RANGE
           Projection:
             ProjectionType: ALL
       BillingMode: PAY_PER_REQUEST
