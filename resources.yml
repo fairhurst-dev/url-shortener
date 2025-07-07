@@ -1,40 +1,40 @@
 Resources:
   userPool:
-  Type: AWS::Cognito::UserPool
-  Properties:
-    UserPoolName: ${self:service}-${sls:stage}-user-pool
-    UsernameAttributes:
-      - email
-    AutoVerifiedAttributes:
-      - email
-    Policies:
-      PasswordPolicy:
-        MinimumLength: 8
-        RequireLowercase: true
-        RequireNumbers: true
-        RequireSymbols: true
-        RequireUppercase: true
-    Schema:
-      - Name: email
-        Required: true
-        Mutable: true
-    MfaConfiguration: OFF
-    EmailVerificationMessage: "Your verification code is {####}"
-    EmailVerificationSubject: "Verify your email"
-    AdminCreateUserConfig:
-      AllowAdminCreateUserOnly: false
-    UsernameConfiguration:
-      CaseSensitive: false
-userPoolClient:
-  Type: AWS::Cognito::UserPoolClient
-  Properties:
-    ClientName: ${self:service}-${sls:stage}-user-pool-client
-    UserPoolId:
-      Ref: userPool
-    ExplicitAuthFlows:
-      - ALLOW_USER_PASSWORD_AUTH
-      - ALLOW_REFRESH_TOKEN_AUTH
-    GenerateSecret: false
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: ${self:service}-${sls:stage}-user-pool
+      UsernameAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+          RequireUppercase: true
+      Schema:
+        - Name: email
+          Required: true
+          Mutable: true
+      MfaConfiguration: OFF
+      EmailVerificationMessage: "Your verification code is {####}"
+      EmailVerificationSubject: "Verify your email"
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: false
+      UsernameConfiguration:
+        CaseSensitive: false
+  userPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: ${self:service}-${sls:stage}-user-pool-client
+      UserPoolId:
+        Ref: userPool
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+      GenerateSecret: false
   UrlsTable:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Retain
@@ -46,6 +46,7 @@ userPoolClient:
         - AttributeName: GSI1PK #Full URL
           AttributeType: S
         - AttributeName: GSI2PK #UserId
+          AttributeType: S
       KeySchema:
         - AttributeName: PK
           KeyType: HASH
@@ -68,7 +69,6 @@ userPoolClient:
         Enabled: true
       PointInTimeRecoverySpecification:
         PointInTimeRecoveryEnabled: true
-
   AnalyticsTable:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Retain
@@ -77,13 +77,15 @@ userPoolClient:
       AttributeDefinitions:
         - AttributeName: PK #ShortCode or #User
           AttributeType: S
+        - AttributeName: GSI1PK
+          AttributeType: S
       KeySchema:
         - AttributeName: PK
           KeyType: HASH
       GlobalSecondaryIndexes:
-        - IndexName: GSI1 #User or #
+        - IndexName: GSI1 #User
           KeySchema:
-            - AttributeName: GSI1
+            - AttributeName: GSI1PK
               KeyType: HASH
           Projection:
             ProjectionType: ALL

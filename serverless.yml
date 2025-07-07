@@ -18,7 +18,7 @@ provider:
   runtime: nodejs20.x
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
-
+  logRetentionInDays: 30
   environment:
     STAGE: ${self:provider.stage}
     USER_POOL_CLIENT_ID:
@@ -29,7 +29,6 @@ provider:
       Ref: userPool
     URL_TABLE: ${self:service}-${self:provider.stage}
     ANALYTICS_TABLE: ${self:service}-${self:provider.stage}-analytics
-
   httpApi:
     metrics: true
     cors: true
@@ -62,78 +61,70 @@ functions:
     events:
       - httpApi:
           method: POST
-          path: /auth/register
-          cors: true
+          path: /api/v1/auth/register
 
   confirmSignUp:
     handler: src/routes/user/confirm.handler
     events:
       - httpApi:
           method: POST
-          path: /auth/confirm
-          cors: true
+          path: /api/v1/auth/confirm
 
   login:
     handler: src/routes/user/login.handler
     events:
       - httpApi:
           method: POST
-          path: /auth/login
-          cors: true
+          path: /api/v1/auth/login
 
   refresh:
     handler: src/routes/user/refresh.handler
     events:
       - httpApi:
           method: POST
-          path: /auth/refresh
-          cors: true
+          path: /api/v1/auth/refresh
 
   #URLs
   shortenUrl:
     handler: src/routes/urls/shorten.handler
     events:
       - httpApi:
-          path: api/v1/shorten
+          path: /api/v1/shorten
           method: POST
-          cors: true
           authorizer:
             name: jwtAuthorizer
 
   redirect:
     handler: src/routes/urls/redirect.handler
     events:
-      - http:
-          path: /{shortenedCode}
+      - httpApi:
+          path: /api/v1/{shortenedCode}
           method: GET
 
   updateFullURL:
     handler: src/routes/urls/update_url.handler
     events:
-      - http:
-          path: api/v1/{shortenedCode}
+      - httpApi:
+          path: /api/v1/{shortenedCode}
           method: PATCH
-          cors: true
           authorizer:
             name: jwtAuthorizer
 
   listUserURLs:
     handler: src/routes/urls/list.handler
     events:
-      - http:
-          path: api/v1/user/{userId}
-          method: get
-          cors: true
+      - httpApi:
+          path: /api/v1/user/{userId}
+          method: GET
           authorizer:
             name: jwtAuthorizer
 
   deleteUrl:
     handler: src/routes/urls/delete.handler
     events:
-      - http:
-          path: api/v1/{shortenedCode}
+      - httpApi:
+          path: /api/v1/{shortenedCode}
           method: DELETE
-          cors: true
           authorizer:
             name: jwtAuthorizer
 
@@ -142,10 +133,9 @@ functions:
   getAnalytics:
     handler: src/routes/analytics/get_analytics.handler
     events:
-      - http:
-          path: api/v1/analytics
-          method: get
-          cors: true
+      - httpApi:
+          path: /api/v1/analytics
+          method: GET
           authorizer:
             name: jwtAuthorizer
 

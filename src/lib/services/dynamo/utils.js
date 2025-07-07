@@ -74,6 +74,15 @@ export const makeGetCodesForURLInput = applySpec({
   },
 });
 
+export const makeGetAnalyticsForUserInput = applySpec({
+  TableName: always(process.env.ANALYTICS_TABLE),
+  KeyConditionExpression: always("GSI1PK = :userUUID"),
+  ExpressionAttributeValues: {
+    ":userUUID": identity,
+  },
+  IndexName: always("GSI1"),
+});
+
 //records
 
 //Users
@@ -81,7 +90,7 @@ export const makeCreateUserInput = applySpec({
   TableName: always(process.env.ANALYTICS_TABLE),
   Item: {
     PK: prop("userUUID"),
-    GSI1: always("#"),
+    GSI1PK: prop("userUUID"),
     data: {
       userUUID: prop("userUUID"),
       requestsInLast5Minutes: always(0),
@@ -93,7 +102,7 @@ export const makeUpsertUserInput = applySpec({
   TableName: always(process.env.ANALYTICS_TABLE),
   Item: {
     PK: prop("userUUID"),
-    GSI1: always("#"),
+    GSI1PK: prop("userUUID"),
     data: {
       userUUID: prop("userUUID"),
       requestsInLast5Minutes: prop("requestsInLast5Minutes"),
@@ -141,7 +150,7 @@ export const makeAnalyticsEntryInput = applySpec({
   TableName: always(process.env.ANALYTICS_TABLE),
   Item: {
     PK: prop("shortCode"),
-    GSI1: prop("userUUID"),
+    GSI1PK: prop("userUUID"),
     data: {
       shortCode: prop("shortCode"),
       userUUID: prop("userUUID"),
@@ -165,13 +174,4 @@ export const makeIncrementAnalyticsInput = applySpec({
     ":increment": always(1),
     ":now": () => new Date().toISOString(),
   },
-});
-
-export const makeGetAnalyticsForUserInput = applySpec({
-  TableName: always(process.env.ANALYTICS_TABLE),
-  KeyConditionExpression: always("GSI1 = :userUUID"),
-  ExpressionAttributeValues: {
-    ":userUUID": identity,
-  },
-  IndexName: always("GSI1"),
 });
