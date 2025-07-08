@@ -1,25 +1,26 @@
 import { middyfy } from "#lib/middleware.js";
 import httpJsonBodyParser from "@middy/http-json-body-parser";
-import { confirmSignUp } from "#lib/services/cognito.js";
+import { confirmSignUp, getCognitoUser } from "#lib/services/cognito/index.js";
 import { confirmOTPValidator } from "#lib/validators.js";
 import {
   badRequest,
   handleCognitoError,
   successResponse,
 } from "#routes/utils.js";
-import { getUserUUID } from "#lib/authorizer.js";
+import { createUser } from "#lib/services/dynamo/index.js";
 
 const confirmHandler = async (event) => {
   try {
-    const { error, value } = confirmOTPValidator.validate(event.body);
+    const { error, value } = confirmOTPValidator(event.body);
     if (error) {
       return badRequest(error);
     }
 
-    const userUUID = getUserUUID(event);
-
     await confirmSignUp(value);
-    await createUser({ userUUID });
+
+    const cognitoUser = await getCognitoUser(value);
+
+    await createUser({ userUUID: cognitoUser.Username });
 
     return successResponse();
   } catch (error) {

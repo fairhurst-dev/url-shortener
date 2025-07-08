@@ -13,6 +13,12 @@ package:
     - "!.nyc_output/**"
     - "!tests/**"
 
+plugins:
+  - serverless-esbuild
+
+build:
+  esbuild: false
+
 provider:
   name: aws
   runtime: nodejs20.x
@@ -27,7 +33,7 @@ provider:
         - ClientId
     USER_POOL_ID:
       Ref: userPool
-    URL_TABLE: ${self:service}-${self:provider.stage}
+    URLS_TABLE: ${self:service}-${self:provider.stage}
     ANALYTICS_TABLE: ${self:service}-${self:provider.stage}-analytics
   httpApi:
     metrics: true
@@ -52,33 +58,34 @@ provider:
             - dynamodb:PutItem
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
+            - cognito-idp:*
           Resource: "*"
 
 functions:
   #users
-  signUp:
-    handler: src/routes/user/signup.handler
+  register:
+    handler: src/routes/users/register.handler
     events:
       - httpApi:
           method: POST
           path: /api/v1/auth/register
 
   confirmSignUp:
-    handler: src/routes/user/confirm.handler
+    handler: src/routes/users/confirm.handler
     events:
       - httpApi:
           method: POST
           path: /api/v1/auth/confirm
 
   login:
-    handler: src/routes/user/login.handler
+    handler: src/routes/users/login.handler
     events:
       - httpApi:
           method: POST
           path: /api/v1/auth/login
 
   refresh:
-    handler: src/routes/user/refresh.handler
+    handler: src/routes/users/refresh.handler
     events:
       - httpApi:
           method: POST
@@ -87,6 +94,8 @@ functions:
   #URLs
   shortenUrl:
     handler: src/routes/urls/shorten.handler
+    environment:
+      GOOGLE_CLOUD_TOKEN: ${env:GOOGLE_CLOUD_TOKEN}
     events:
       - httpApi:
           path: /api/v1/shorten
@@ -98,14 +107,16 @@ functions:
     handler: src/routes/urls/redirect.handler
     events:
       - httpApi:
-          path: /api/v1/{shortenedCode}
+          path: /{shortCode}
           method: GET
 
   updateFullURL:
-    handler: src/routes/urls/update_url.handler
+    handler: src/routes/urls/update.handler
+    environment:
+      GOOGLE_CLOUD_TOKEN: ${env:GOOGLE_CLOUD_TOKEN}
     events:
       - httpApi:
-          path: /api/v1/{shortenedCode}
+          path: /api/v1/{shortCode}
           method: PATCH
           authorizer:
             name: jwtAuthorizer
@@ -114,7 +125,7 @@ functions:
     handler: src/routes/urls/list.handler
     events:
       - httpApi:
-          path: /api/v1/user/{userId}
+          path: /api/v1/urls
           method: GET
           authorizer:
             name: jwtAuthorizer
@@ -123,7 +134,7 @@ functions:
     handler: src/routes/urls/delete.handler
     events:
       - httpApi:
-          path: /api/v1/{shortenedCode}
+          path: /api/v1/{shortCode}
           method: DELETE
           authorizer:
             name: jwtAuthorizer

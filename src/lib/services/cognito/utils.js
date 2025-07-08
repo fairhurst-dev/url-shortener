@@ -34,3 +34,8 @@ export const makeConfirmSignupInput = applySpec({
   Username: prop("email"),
   ConfirmationCode: prop("otp"),
 });
+
+export const makeAdminGetUserInput = applySpec({
+  UserPoolId: always(process.env.USER_POOL_ID),
+  Username: prop("email"),
+});

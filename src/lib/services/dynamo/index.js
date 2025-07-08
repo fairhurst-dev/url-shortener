@@ -14,8 +14,9 @@ import {
   makeGetAnalyticsForCodeInput,
   extractDataFromResponse,
   makeGetAnalyticsForUserInput,
+  analyticsAccessor,
 } from "./utils.js";
-import { andThen, path, pipe } from "ramda";
+import { andThen, path, pipe, tap } from "ramda";
 
 const client = new DynamoDB({});
 const docClient = DynamoDBDocument.from(client);
@@ -47,7 +48,11 @@ export const getCodesForURL = pipe(
   andThen(extractDataFromResponse)
 );
 
-export const createShortCode = pipe(makeCreateShortCodeInput, put);
+export const createShortCode = pipe(
+  makeCreateShortCodeInput,
+  tap(put),
+  andThen(path(["Item", "data"]))
+);
 
 export const getShortCodeEntry = pipe(
   shortCodeAccessor,
@@ -62,6 +67,8 @@ export const getFullURLByShortCode = pipe(
 );
 
 export const deleteShortCode = pipe(shortCodeAccessor, remove);
+
+export const deleteAnalyticsForShortCode = pipe(analyticsAccessor, remove);
 
 export const updateFullURLByShortCode = pipe(
   updateFullURLByShortCodeInput,
