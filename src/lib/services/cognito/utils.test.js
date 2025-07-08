@@ -4,6 +4,7 @@ import {
   makeLoginInput,
   makeRefreshInput,
   makeConfirmSignupInput,
+  makeAdminGetUserInput,
 } from "./utils.js";
 import { LOGIN_COGNITO_RESP } from "#lib/samples.js";
 import { describe, it, expect } from "vitest";
@@ -63,6 +64,15 @@ describe("transformers", () => {
       ClientId: process.env.USER_POOL_CLIENT_ID,
       Username: "test@example.com",
       ConfirmationCode: "123456",
+    });
+  });
+
+  it("makes admin get user input", () => {
+    const input = { email: "test@example.com" };
+    const actual = makeAdminGetUserInput(input);
+    expect(actual).toEqual({
+      UserPoolId: process.env.USER_POOL_ID,
+      Username: "test@example.com",
     });
   });
 });

@@ -6,8 +6,12 @@ export const userSchema = Joi.object({
     .min(8)
     .max(16)
     .required()
-    .pattern(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>?`~]/)
-    .message('"password" must contain at least one special character'),
+    .pattern(/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>?`~]/)
+    .message('"password" must contain at least one special character')
+    .pattern(/[A-Z]/)
+    .message('"password" must contain at least one uppercase letter')
+    .pattern(/[a-z]/)
+    .message('"password" must contain at least one lowercase letter'),
 });
 
 export const confirmOTPSchema = Joi.object({
@@ -20,7 +24,7 @@ export const refreshSchema = Joi.object({
   deviceKey: Joi.string().optional(),
 });
 
-export const shortenURLSchema = Joi.object({
+export const fullURLSchema = Joi.object({
   fullURL: Joi.string()
     .uri({
       scheme: ["https", "http"],
@@ -28,10 +32,6 @@ export const shortenURLSchema = Joi.object({
       relativeOnly: false,
     })
     .required(),
-});
-
-export const updateURLSchema = shortenURLSchema.keys({
-  shortCode: Joi.string().required(),
 });
 
 export const deleteURLSchema = Joi.object({
