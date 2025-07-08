@@ -6,6 +6,7 @@ import {
   doesUserOwnShortCode,
 } from "#lib/authorizer.js";
 import { deleteShortCode } from "#lib/services/dynamo/index.js";
+import { path } from "ramda";
 
 const deleteCode = async (event) => {
   try {

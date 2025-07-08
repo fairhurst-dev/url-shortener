@@ -39,7 +39,7 @@ Resources:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Retain
     Properties:
-      TableName: ${self:provider.environment.URL_TABLE}
+      TableName: ${self:provider.environment.URLS_TABLE}
       AttributeDefinitions:
         - AttributeName: PK #shortenedCode
           AttributeType: S

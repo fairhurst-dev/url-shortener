@@ -1,5 +1,5 @@
 import { middyfy } from "#lib/middleware.js";
-import { JSONBodyParser } from "@middy/http-json-body-parser";
+import httpJsonBodyParser from "@middy/http-json-body-parser";
 import { updateURLValidator } from "#lib/validators.js";
 import { badRequest, bodyFormatter, handleError } from "#routes/utils.js";
 import {
@@ -12,7 +12,7 @@ import { updateFullURLByShortCode } from "#lib/services/dynamo/index.js";
 
 const updateURL = async (event) => {
   try {
-    const { error, value } = updateURLValidator.validate(event.body);
+    const { error, value } = updateURLValidator(event.body);
     if (error) {
       return badRequest(error);
     }
@@ -32,7 +32,7 @@ const updateURL = async (event) => {
       });
 
       return bodyFormatter({
-        shortCode: shortCode,
+        shortCode: value.shortCode,
         fullURL: value.fullURL,
       });
     }
@@ -41,4 +41,4 @@ const updateURL = async (event) => {
   }
 };
 
-export const handler = middyfy(updateURL).use(JSONBodyParser());
+export const handler = middyfy(updateURL).use(httpJsonBodyParser());

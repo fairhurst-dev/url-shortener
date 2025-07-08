@@ -6,7 +6,7 @@ export const userSchema = Joi.object({
     .min(8)
     .max(16)
     .required()
-    .pattern(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>?`~]/)
+    .pattern(/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>?`~]/)
     .message('"password" must contain at least one special character'),
 });
 

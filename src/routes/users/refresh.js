@@ -1,6 +1,6 @@
 import { middyfy } from "#lib/middleware.js";
 import httpJsonBodyParser from "@middy/http-json-body-parser";
-import { refresh } from "#lib/services/cognito.js";
+import { refresh } from "#lib/services/cognito/index.js";
 import { refreshValidator } from "#lib/validators.js";
 import {
   badRequest,
@@ -10,7 +10,7 @@ import {
 
 const confirmHandler = async (event) => {
   try {
-    const { error, value } = refreshValidator.validate(event.body);
+    const { error, value } = refreshValidator(event.body);
     if (error) {
       return badRequest(error);
     }

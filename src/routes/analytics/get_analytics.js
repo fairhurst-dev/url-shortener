@@ -2,6 +2,7 @@ import { getUserUUID } from "#lib/authorizer.js";
 import { middyfy } from "#lib/middleware.js";
 import { bodyFormatter, handleError } from "#routes/utils.js";
 import { getAnalyticsForUser } from "#lib/services/dynamo/index.js";
+import { hasUserReachedRequestLimit } from "#lib/authorizer.js";
 
 const getAnalytics = async (event) => {
   try {

@@ -59,7 +59,7 @@ const tooManyResources = applySpec({
   body: always("You have reached the limit of 10 short URLs."),
 });
 
-const notFound = applySpec({
+export const notFound = applySpec({
   statusCode: always(404),
   body: always("Not Found"),
 });

@@ -1,6 +1,10 @@
 import { middyfy } from "#lib/middleware.js";
 import { badRequest, handleError, notFound } from "#routes/utils.js";
 import { path } from "ramda";
+import {
+  getFullURLByShortCode,
+  incrementAnalytics,
+} from "#lib/services/dynamo/index.js";
 
 const redirect = async (event) => {
   try {
@@ -16,7 +20,7 @@ const redirect = async (event) => {
       return notFound();
     }
 
-    await incrementAnalytics({ shortCode });
+    await incrementAnalytics(shortCode);
 
     return {
       statusCode: 302,

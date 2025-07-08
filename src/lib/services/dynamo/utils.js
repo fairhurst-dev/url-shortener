@@ -8,8 +8,9 @@ import {
   pipe,
   prop,
   isEmpty,
+  ifElse,
+  map,
 } from "ramda";
-import { aL } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
 
 //helpers
 
@@ -165,7 +166,7 @@ export const makeAnalyticsEntryInput = applySpec({
 export const makeIncrementAnalyticsInput = applySpec({
   TableName: always(process.env.ANALYTICS_TABLE),
   Key: {
-    PK: makeAnalyticsCodeKey,
+    PK: identity,
   },
   UpdateExpression: always(
     "SET totalClicks = totalClicks + :increment, timeStampLastAccessed = :now"
