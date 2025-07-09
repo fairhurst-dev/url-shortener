@@ -20,7 +20,7 @@ export const refreshSchema = Joi.object({
   deviceKey: Joi.string().optional(),
 });
 
-export const shortenURLSchema = Joi.object({
+export const fullURLSchema = Joi.object({
   fullURL: Joi.string()
     .uri({
       scheme: ["https", "http"],
@@ -28,10 +28,6 @@ export const shortenURLSchema = Joi.object({
       relativeOnly: false,
     })
     .required(),
-});
-
-export const updateURLSchema = shortenURLSchema.keys({
-  shortCode: Joi.string().required(),
 });
 
 export const deleteURLSchema = Joi.object({

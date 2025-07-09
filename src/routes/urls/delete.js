@@ -5,7 +5,10 @@ import {
   getUserUUID,
   doesUserOwnShortCode,
 } from "#lib/authorizer.js";
-import { deleteShortCode } from "#lib/services/dynamo/index.js";
+import {
+  deleteShortCode,
+  deleteAnalyticsForShortCode,
+} from "#lib/services/dynamo/index.js";
 import { path } from "ramda";
 
 const deleteCode = async (event) => {
@@ -23,6 +26,7 @@ const deleteCode = async (event) => {
     });
 
     await deleteShortCode(shortCode);
+    await deleteAnalyticsForShortCode(shortCode);
 
     return {
       statusCode: 204,

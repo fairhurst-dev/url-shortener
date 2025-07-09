@@ -1,5 +1,4 @@
 import {
-  getUserByUUID,
   getURLSForUser,
   upsertUser,
   getShortCodeEntry,
@@ -56,14 +55,14 @@ export const hasUserReachedCodeLimit = async (user) => {
   return true;
 };
 
-export const doesUserOwnShortCode = async ({ userUUID, shortCode }) => {
+export const doesUserOwnShortCode = async ({ user, shortCode }) => {
   const shortCodeEntry = await getShortCodeEntry(shortCode);
 
   if (!shortCodeEntry) {
     throw new Error("EntryNotFoundException");
   }
 
-  if (shortCodeEntry.userUUID !== userUUID) {
+  if (shortCodeEntry.userUUID !== user.userUUID) {
     throw new Error("OwnershipCheckFailedException");
   }
   return true;

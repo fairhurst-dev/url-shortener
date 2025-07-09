@@ -41,7 +41,7 @@ Resources:
     Properties:
       TableName: ${self:provider.environment.URLS_TABLE}
       AttributeDefinitions:
-        - AttributeName: PK #shortenedCode
+        - AttributeName: PK #shortCode
           AttributeType: S
         - AttributeName: GSI1PK #Full URL
           AttributeType: S

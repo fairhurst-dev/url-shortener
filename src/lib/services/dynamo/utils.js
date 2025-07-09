@@ -50,6 +50,13 @@ export const shortCodeAccessor = applySpec({
   },
 });
 
+export const analyticsAccessor = applySpec({
+  TableName: always(process.env.ANALYTICS_TABLE),
+  Key: {
+    PK: identity,
+  },
+});
+
 export const makeGetURLSforUserInput = applySpec({
   TableName: always(process.env.URLS_TABLE),
   KeyConditionExpression: always("GSI2PK = :pk"),
@@ -138,7 +145,11 @@ export const updateFullURLByShortCodeInput = applySpec({
   Key: {
     PK: prop("shortCode"),
   },
-  UpdateExpression: always("SET data.fullURL = :fullURL, GSI1PK = :fullURL"),
+  UpdateExpression: always("SET #data.#fullURL = :fullURL, GSI1PK = :fullURL"),
+  ExpressionAttributeNames: {
+    "#data": always("data"),
+    "#fullURL": always("fullURL"),
+  },
   ExpressionAttributeValues: {
     ":fullURL": prop("fullURL"),
   },
@@ -169,8 +180,13 @@ export const makeIncrementAnalyticsInput = applySpec({
     PK: identity,
   },
   UpdateExpression: always(
-    "SET totalClicks = totalClicks + :increment, timeStampLastAccessed = :now"
+    "SET #data.#totalClicks = #data.#totalClicks + :increment, #data.#timeStampLastAccessed = :now"
   ),
+  ExpressionAttributeNames: {
+    "#data": always("data"),
+    "#totalClicks": always("totalClicks"),
+    "#timeStampLastAccessed": always("timeStampLastAccessed"),
+  },
   ExpressionAttributeValues: {
     ":increment": always(1),
     ":now": () => new Date().toISOString(),

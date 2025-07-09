@@ -12,7 +12,7 @@ export const isSafeURL = tryCatch(
     andThen(
       pipe(
         tap(console.log),
-        ifElse(hasPath(["data", "matches"]), always(true), always(false))
+        ifElse(hasPath(["data", "matches"]), always(false), always(true))
       )
     )
   ),

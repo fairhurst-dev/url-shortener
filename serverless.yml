@@ -107,14 +107,16 @@ functions:
     handler: src/routes/urls/redirect.handler
     events:
       - httpApi:
-          path: /api/v1/{shortenedCode}
+          path: /api/v1/{shortCode}
           method: GET
 
   updateFullURL:
     handler: src/routes/urls/update.handler
+    environment:
+      GOOGLE_CLOUD_TOKEN: ${env:GOOGLE_CLOUD_TOKEN}
     events:
       - httpApi:
-          path: /api/v1/{shortenedCode}
+          path: /api/v1/{shortCode}
           method: PATCH
           authorizer:
             name: jwtAuthorizer
@@ -123,7 +125,7 @@ functions:
     handler: src/routes/urls/list.handler
     events:
       - httpApi:
-          path: /api/v1/user/{userId}
+          path: /api/v1/urls
           method: GET
           authorizer:
             name: jwtAuthorizer
@@ -132,7 +134,7 @@ functions:
     handler: src/routes/urls/delete.handler
     events:
       - httpApi:
-          path: /api/v1/{shortenedCode}
+          path: /api/v1/{shortCode}
           method: DELETE
           authorizer:
             name: jwtAuthorizer

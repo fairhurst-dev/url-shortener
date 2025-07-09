@@ -1,6 +1,6 @@
 import { middyfy } from "#lib/middleware.js";
 import httpJsonBodyParser from "@middy/http-json-body-parser";
-import { shortenURLValidator } from "#lib/validators.js";
+import { fullURLValidator } from "#lib/validators.js";
 import { badRequest, bodyFormatter, handleError } from "#routes/utils.js";
 import {
   hasUserReachedRequestLimit,
@@ -17,7 +17,7 @@ import {
 
 const shorten = async (event) => {
   try {
-    const { error, value } = shortenURLValidator(event.body);
+    const { error, value } = fullURLValidator(event.body);
     if (error) {
       return badRequest(error);
     }
@@ -27,26 +27,37 @@ const shorten = async (event) => {
     await hasUserReachedRequestLimit(user);
     await hasUserReachedCodeLimit(user);
 
+    console.log("user can proceed", user);
+
     const isSafeFlag = await isSafeURL(value.fullURL);
     if (isSafeFlag) {
+      console.log("URL is safe, proceeding to shorten");
       const shortCode = generateShortCode(value.fullURL);
 
-      await createShortCode({
+      console.log("Generated short code:", shortCode);
+
+      const resp = await createShortCode({
         userUUID,
         shortCode,
         fullURL: value.fullURL,
       });
 
-      await createAnalyticsEntry({
+      console.log("Short code created in database:", resp);
+
+      const analyticsResp = await createAnalyticsEntry({
         userUUID,
         shortCode,
         fullURL: value.fullURL,
       });
+
+      console.log("Analytics entry created:", analyticsResp);
 
       return bodyFormatter({
         shortCode,
         fullURL: value.fullURL,
       });
+    } else {
+      throw new Error("URLSafetyCheckFailedException");
     }
   } catch (error) {
     return handleError(error);

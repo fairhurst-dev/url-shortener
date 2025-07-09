@@ -34,13 +34,13 @@ This is a serverless application built on AWS using:
 ### URL Management Endpoints (Protected)
 
 - `POST /api/v1/shorten` - Create a shortened URL
-- `PATCH /api/v1/{shortenedCode}` - Update a shortened URL
-- `DELETE /api/v1/{shortenedCode}` - Delete a shortened URL
+- `PATCH /api/v1/{shortCode}` - Update a shortened URL
+- `DELETE /api/v1/{shortCode}` - Delete a shortened URL
 - `GET /api/v1/user/{userId}` - List user's URLs
 
 ## Public Redirect Endpoints
 
-- `GET /api/v1/{shortenedCode}` - Redirect to original URL
+- `GET /api/v1/{shortCode}` - Redirect to original URL
 
 ### Analytics Endpoints (Protected)
 
@@ -202,14 +202,14 @@ curl -X GET https://your-api-gateway-url/api/v1/abc123
 
 ### URLs Table
 
-- **PK**: `{shortenedCode}` - Primary key
+- **PK**: `{shortCode}` - Primary key
 - **GSI1PK**: `{fullURL}` - Global Secondary Index for URL lookup
 - **GSI2PK**: `{userId}` - Global Secondary Index for user URL listing
 - **ttl**: Time-to-live for automatic cleanup
 
 ### Analytics Table
 
-- **PK**: `{shortenedCode}` or `{userId}` - Primary key
+- **PK**: `{shortCode}` or `{userId}` - Primary key
 - **GSI1PK**: `{userId}` - Global Secondary Index for user analytics
 - **ttl**: Time-to-live for automatic cleanup
 

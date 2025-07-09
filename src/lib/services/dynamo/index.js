@@ -14,6 +14,7 @@ import {
   makeGetAnalyticsForCodeInput,
   extractDataFromResponse,
   makeGetAnalyticsForUserInput,
+  analyticsAccessor,
 } from "./utils.js";
 import { andThen, path, pipe } from "ramda";
 
@@ -62,6 +63,8 @@ export const getFullURLByShortCode = pipe(
 );
 
 export const deleteShortCode = pipe(shortCodeAccessor, remove);
+
+export const deleteAnalyticsForShortCode = pipe(analyticsAccessor, remove);
 
 export const updateFullURLByShortCode = pipe(
   updateFullURLByShortCodeInput,
