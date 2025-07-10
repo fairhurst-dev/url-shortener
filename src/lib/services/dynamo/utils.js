@@ -169,6 +169,7 @@ export const makeAnalyticsEntryInput = applySpec({
       totalClicks: always(0),
       timeStampLastAccessed: always(null),
       createdAt: () => new Date().toISOString(),
+      ttlString: prop("ttlString"),
     },
   },
   ConditionExpression: always("attribute_not_exists(PK)"),

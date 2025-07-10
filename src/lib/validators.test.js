@@ -158,6 +158,32 @@ describe("Validators", () => {
         );
         expect(result.value).toEqual(invalidUser);
       });
+      it("rejects password without uppercase letters", () => {
+        const invalidUser = {
+          email: "test@example.com",
+          password: "password123!",
+        };
+
+        const result = userValidator(invalidUser);
+
+        expect(result.error).toContain(
+          "must contain at least one uppercase letter"
+        );
+        expect(result.value).toEqual(invalidUser);
+      });
+      it("rejects password without lowercase letters", () => {
+        const invalidUser = {
+          email: "test@example.com",
+          password: "PASSWORD123!",
+        };
+
+        const result = userValidator(invalidUser);
+
+        expect(result.error).toContain(
+          "must contain at least one lowercase letter"
+        );
+        expect(result.value).toEqual(invalidUser);
+      });
 
       it("combines multiple validation errors", () => {
         const invalidUser = {
@@ -171,6 +197,9 @@ describe("Validators", () => {
         expect(result.error).toContain("at least 8 characters");
         expect(result.error).toContain(
           "must contain at least one special character"
+        );
+        expect(result.error).toContain(
+          "must contain at least one uppercase letter"
         );
       });
     });

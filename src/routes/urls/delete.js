@@ -8,6 +8,7 @@ import {
 import {
   deleteShortCode,
   deleteAnalyticsForShortCode,
+  getUserByUUID,
 } from "#lib/services/dynamo/index.js";
 import { path } from "ramda";
 
@@ -18,10 +19,11 @@ const deleteCode = async (event) => {
       return badRequest("Missing shortCode");
     }
     const userUUID = getUserUUID(event);
+    const user = await getUserByUUID(userUUID);
 
-    await hasUserReachedRequestLimit(event);
+    await hasUserReachedRequestLimit(user);
     await doesUserOwnShortCode({
-      userUUID,
+      user,
       shortCode,
     });
 

@@ -27,14 +27,9 @@ const shorten = async (event) => {
     await hasUserReachedRequestLimit(user);
     await hasUserReachedCodeLimit(user);
 
-    console.log("user can proceed", user);
-
     const isSafeFlag = await isSafeURL(value.fullURL);
     if (isSafeFlag) {
-      console.log("URL is safe, proceeding to shorten");
       const shortCode = generateShortCode(value.fullURL);
-
-      console.log("Generated short code:", shortCode);
 
       const resp = await createShortCode({
         userUUID,
@@ -42,19 +37,17 @@ const shorten = async (event) => {
         fullURL: value.fullURL,
       });
 
-      console.log("Short code created in database:", resp);
-
-      const analyticsResp = await createAnalyticsEntry({
+      await createAnalyticsEntry({
         userUUID,
         shortCode,
+        ttlString: resp.ttlString,
         fullURL: value.fullURL,
       });
-
-      console.log("Analytics entry created:", analyticsResp);
 
       return bodyFormatter({
         shortCode,
         fullURL: value.fullURL,
+        ttlString: resp.ttlString,
       });
     } else {
       throw new Error("URLSafetyCheckFailedException");

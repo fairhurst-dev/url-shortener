@@ -7,7 +7,11 @@ export const userSchema = Joi.object({
     .max(16)
     .required()
     .pattern(/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>?`~]/)
-    .message('"password" must contain at least one special character'),
+    .message('"password" must contain at least one special character')
+    .pattern(/[A-Z]/)
+    .message('"password" must contain at least one uppercase letter')
+    .pattern(/[a-z]/)
+    .message('"password" must contain at least one lowercase letter'),
 });
 
 export const confirmOTPSchema = Joi.object({

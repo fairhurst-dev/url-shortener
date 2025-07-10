@@ -107,7 +107,7 @@ functions:
     handler: src/routes/urls/redirect.handler
     events:
       - httpApi:
-          path: /api/v1/{shortCode}
+          path: /{shortCode}
           method: GET
 
   updateFullURL:

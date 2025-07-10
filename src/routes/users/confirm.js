@@ -20,8 +20,6 @@ const confirmHandler = async (event) => {
 
     const cognitoUser = await getCognitoUser(value);
 
-    console.log("Cognito User:", cognitoUser);
-
     await createUser({ userUUID: cognitoUser.Username });
 
     return successResponse();

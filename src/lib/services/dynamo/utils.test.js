@@ -255,6 +255,7 @@ describe("DynamoDB utils", () => {
           const analyticsData = {
             shortCode: "abc123",
             userUUID: "test-user-123",
+            ttlString: "2024-01-01T00:00:00.000Z",
           };
           const result = makeAnalyticsEntryInput(analyticsData);
 
@@ -269,6 +270,7 @@ describe("DynamoDB utils", () => {
                 totalClicks: 0,
                 timeStampLastAccessed: null,
                 createdAt: mockDate.toISOString(),
+                ttlString: "2024-01-01T00:00:00.000Z",
               },
             },
             ConditionExpression: "attribute_not_exists(PK)",
