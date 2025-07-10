@@ -1,6 +1,6 @@
 import { middyfy } from "#lib/middleware.js";
 import httpJsonBodyParser from "@middy/http-json-body-parser";
-import { signup } from "#lib/services/cognito.js";
+import { signup } from "#lib/services/cognito/index.js";
 import { userValidator } from "#lib/validators.js";
 import {
   badRequest,
@@ -8,9 +8,9 @@ import {
   successResponse,
 } from "#routes/utils.js";
 
-const signupHandler = async (event) => {
+const registerHandler = async (event) => {
   try {
-    const { error, value } = userValidator.validate(event.body);
+    const { error, value } = userValidator(event.body);
     if (error) {
       return badRequest(error);
     }
@@ -23,4 +23,4 @@ const signupHandler = async (event) => {
   }
 };
 
-export const handler = middyfy(signupHandler).use(httpJsonBodyParser());
+export const handler = middyfy(registerHandler).use(httpJsonBodyParser());

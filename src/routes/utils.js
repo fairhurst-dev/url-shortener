@@ -13,25 +13,21 @@ const stringify = (input) => JSON.stringify(input);
 
 export const handleError = (error) => {
   console.error(error);
-  if (error.name === "TooManyRequestsException") {
-    return tooManyRequests();
-  }
-  if (error.name === "UserNotFoundException") {
-    return unauthorized();
-  }
-  if (error.name === "OwnershipCheckFailedException") {
-    return unauthorized();
-  }
-  if (error.name === "TooManyResourcesException") {
-    return tooManyResources();
-  }
-  if (error.name === "URLSafetyCheckFailedException") {
-    return badRequest("This URL is not safe");
-  }
-  if (error.name === "EntryNotFoundException") {
-    return notFound();
-  } else {
-    return defaultError();
+
+  switch (error?.message) {
+    case "TooManyRequestsException":
+      return tooManyRequests();
+    case "UserNotFoundException":
+    case "OwnershipCheckFailedException":
+      return unauthorized();
+    case "TooManyResourcesException":
+      return tooManyResources();
+    case "URLSafetyCheckFailedException":
+      return badRequest("This URL is not safe");
+    case "EntryNotFoundException":
+      return notFound();
+    default:
+      return defaultError();
   }
 };
 
@@ -59,7 +55,7 @@ const tooManyResources = applySpec({
   body: always("You have reached the limit of 10 short URLs."),
 });
 
-const notFound = applySpec({
+export const notFound = applySpec({
   statusCode: always(404),
   body: always("Not Found"),
 });

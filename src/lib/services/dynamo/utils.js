@@ -8,8 +8,9 @@ import {
   pipe,
   prop,
   isEmpty,
+  ifElse,
+  map,
 } from "ramda";
-import { aL } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
 
 //helpers
 
@@ -44,6 +45,13 @@ export const makeGetUserInput = applySpec({
 
 export const shortCodeAccessor = applySpec({
   TableName: always(process.env.URLS_TABLE),
+  Key: {
+    PK: identity,
+  },
+});
+
+export const analyticsAccessor = applySpec({
+  TableName: always(process.env.ANALYTICS_TABLE),
   Key: {
     PK: identity,
   },
@@ -137,7 +145,11 @@ export const updateFullURLByShortCodeInput = applySpec({
   Key: {
     PK: prop("shortCode"),
   },
-  UpdateExpression: always("SET data.fullURL = :fullURL, GSI1PK = :fullURL"),
+  UpdateExpression: always("SET #data.#fullURL = :fullURL, GSI1PK = :fullURL"),
+  ExpressionAttributeNames: {
+    "#data": always("data"),
+    "#fullURL": always("fullURL"),
+  },
   ExpressionAttributeValues: {
     ":fullURL": prop("fullURL"),
   },
@@ -157,6 +169,7 @@ export const makeAnalyticsEntryInput = applySpec({
       totalClicks: always(0),
       timeStampLastAccessed: always(null),
       createdAt: () => new Date().toISOString(),
+      ttlString: prop("ttlString"),
     },
   },
   ConditionExpression: always("attribute_not_exists(PK)"),
@@ -165,11 +178,16 @@ export const makeAnalyticsEntryInput = applySpec({
 export const makeIncrementAnalyticsInput = applySpec({
   TableName: always(process.env.ANALYTICS_TABLE),
   Key: {
-    PK: makeAnalyticsCodeKey,
+    PK: identity,
   },
   UpdateExpression: always(
-    "SET totalClicks = totalClicks + :increment, timeStampLastAccessed = :now"
+    "SET #data.#totalClicks = #data.#totalClicks + :increment, #data.#timeStampLastAccessed = :now"
   ),
+  ExpressionAttributeNames: {
+    "#data": always("data"),
+    "#totalClicks": always("totalClicks"),
+    "#timeStampLastAccessed": always("timeStampLastAccessed"),
+  },
   ExpressionAttributeValues: {
     ":increment": always(1),
     ":now": () => new Date().toISOString(),

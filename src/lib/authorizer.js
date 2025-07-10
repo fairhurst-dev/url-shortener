@@ -1,10 +1,9 @@
 import {
-  getUserByUUID,
   getURLSForUser,
   upsertUser,
   getShortCodeEntry,
 } from "#lib/services/dynamo/index.js";
-import { ifElse, isNil } from "ramda";
+import { ifElse, isNil, pipe, path, always, identity } from "ramda";
 
 export const getUserUUID = pipe(
   path(["requestContext", "authorizer", "jwt", "claims", "username"]),
@@ -25,11 +24,7 @@ const hasMadeRequestInLast5Minutes = (user) => {
   );
 };
 
-export const hasUserReachedRequestLimit = async (event) => {
-  const userUUID = getUserUUID(event);
-
-  const user = await getUserByUUID(userUUID);
-
+export const hasUserReachedRequestLimit = async (user) => {
   if (!user) {
     throw new Error("UserNotFoundException");
   }
@@ -48,30 +43,26 @@ export const hasUserReachedRequestLimit = async (event) => {
   return true;
 };
 
-export const hasUserReachedCodeLimit = async (event) => {
-  const userUUID = getUserUUID(event);
-
-  const user = await getUserByUUID(userUUID);
-
+export const hasUserReachedCodeLimit = async (user) => {
   if (!user) {
     throw new Error("UserNotFoundException");
   }
 
-  const urlsForUser = await getURLSForUser(userUUID);
+  const urlsForUser = await getURLSForUser(user.userUUID);
   if (urlsForUser.length >= 10) {
     throw new Error("TooManyResourcesException");
   }
   return true;
 };
 
-export const doesUserOwnShortCode = async ({ userUUID, shortCode }) => {
+export const doesUserOwnShortCode = async ({ user, shortCode }) => {
   const shortCodeEntry = await getShortCodeEntry(shortCode);
 
   if (!shortCodeEntry) {
     throw new Error("EntryNotFoundException");
   }
 
-  if (shortCodeEntry.userUUID !== userUUID) {
+  if (shortCodeEntry.userUUID !== user.userUUID) {
     throw new Error("OwnershipCheckFailedException");
   }
   return true;

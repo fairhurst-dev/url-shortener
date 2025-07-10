@@ -1,6 +1,6 @@
 import { middyfy } from "#lib/middleware.js";
 import httpJsonBodyParser from "@middy/http-json-body-parser";
-import { login } from "#lib/services/cognito.js";
+import { login } from "#lib/services/cognito/index.js";
 import { userValidator } from "#lib/validators.js";
 import {
   badRequest,
@@ -10,7 +10,7 @@ import {
 
 const loginHandler = async (event) => {
   try {
-    const { error, value } = userValidator.validate(event.body);
+    const { error, value } = userValidator(event.body);
     if (error) {
       return badRequest(error);
     }
