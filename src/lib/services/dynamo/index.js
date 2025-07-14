@@ -51,7 +51,7 @@ export const getCodesForURL = pipe(
 export const createShortCode = pipe(
   makeCreateShortCodeInput,
   tap(put),
-  andThen(path(["Item", "data"]))
+  path(["Item", "data"])
 );
 
 export const getShortCodeEntry = pipe(
