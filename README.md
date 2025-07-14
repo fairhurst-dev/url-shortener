@@ -2,13 +2,17 @@
 
 A serverless URL shortener service built with AWS Lambda, API Gateway, DynamoDB, and Cognito for user authentication. This service provides a secure, scalable way to shorten URLs with user management, analytics, and safe browsing protection.
 
+## Try it in Postman:
+
+https://www.postman.com/fairhurst-dev/fairhurst-dev/collection/y7t9tpc/url-shortener?action=share&creator=39373856
+
 ## Features
 
 - **URL Shortening**: Generate short, unique codes for long URLs
 - **User Authentication**: Secure user registration, login, and JWT-based authorization
 - **Safe Browsing**: Integration with Google Safe Browsing API to protect against malicious URLs
-- **Analytics**: Track URL usage and analytics
-- **User Management**: Users can manage their own shortened URLs
+- **Analytics**: Track URL total clicks and timestamp last accessed
+- **Admin URL Management**: Users can manage their own shortened URLs
 - **Rate Limiting**: Built-in protection against abuse
 - **CORS Support**: Frontend-friendly API with proper CORS configuration
 
@@ -24,6 +28,10 @@ This is a serverless application built on AWS using:
 
 ## API Endpoints
 
+## Public Redirect Endpoints
+
+- `GET /{shortCode}` - Redirect to original URL
+
 ### Authentication Endpoints
 
 - `POST /api/v1/auth/register` - User registration
@@ -37,10 +45,6 @@ This is a serverless application built on AWS using:
 - `PATCH /api/v1/{shortCode}` - Update a shortened URL
 - `DELETE /api/v1/{shortCode}` - Delete a shortened URL
 - `GET /api/v1/user/{userId}` - List user's URLs
-
-## Public Redirect Endpoints
-
-- `GET /api/v1/{shortCode}` - Redirect to original URL
 
 ### Analytics Endpoints (Protected)
 
