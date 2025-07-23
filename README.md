@@ -16,15 +16,17 @@ https://www.postman.com/fairhurst-dev/fairhurst-dev/collection/y7t9tpc/url-short
 - **Rate Limiting**: Built-in protection against abuse
 - **CORS Support**: Frontend-friendly API with proper CORS configuration
 
-## Architecture
+## Technology Stack
 
-This is a serverless application built on AWS using:
-
-- **AWS Lambda**: Serverless compute for handling requests
-- **API Gateway**: HTTP API for routing and authorization
-- **DynamoDB**: NoSQL database for storing URLs and analytics
-- **Cognito**: User authentication and authorization
-- **CloudFormation**: Infrastructure as code via Serverless Framework
+- **Runtime**: Node.js 20.x
+- **Framework**: Serverless Framework v4
+- **Authentication**: AWS Cognito
+- **Database**: DynamoDB
+- **Testing**: Vitest
+- **Validation**: Joi
+- **Middleware**: Middy
+- **Functional Programming**: Ramda
+- **Linting**: ESLint
 
 ## API Endpoints
 
@@ -75,23 +77,12 @@ url-shortener/
 └── package.json
 ```
 
-## Technology Stack
-
-- **Runtime**: Node.js 20.x
-- **Framework**: Serverless Framework v4
-- **Authentication**: AWS Cognito
-- **Database**: DynamoDB
-- **Testing**: Vitest
-- **Validation**: Joi
-- **Middleware**: Middy
-- **Functional Programming**: Ramda
-- **Linting**: ESLint
-
 ## Prerequisites
 
 - Node.js 20.x or higher
 - AWS CLI configured with appropriate credentials
 - Serverless Framework CLI (`npm install -g serverless`)
+- A [Google Cloud](https://cloud.google.com/) account with Safe Browsing API enabled
 
 ## Installation
 
@@ -102,36 +93,30 @@ url-shortener/
    cd url-shortener
    ```
 
-2. Install dependencies:
+2. Copy the environment variables example and configure them:
+
+   ```bash
+   cp .env.example .env
+   # Edit `.env` and configure GOOGLE_CLOUD_TOKEN
+   ```
+
+3. Install Serverless globally:
+
+   ```bash
+   npm install serverless -g
+   serverless login
+   ```
+
+4. Install dependencies:
 
    ```bash
    npm install
    ```
 
-3. Configure AWS credentials:
+5. Configure AWS credentials:
    ```bash
    aws configure
    ```
-
-## Configuration
-
-### Environment Variables
-
-The service uses the following environment variables (automatically set by Serverless):
-
-- `STAGE`: Deployment stage (dev, staging, prod)
-- `USER_POOL_CLIENT_ID`: Cognito User Pool Client ID
-- `USER_POOL_ID`: Cognito User Pool ID
-- `URLS_TABLE`: DynamoDB table name for URLs
-- `ANALYTICS_TABLE`: DynamoDB table name for analytics
-
-### Google Safe Browsing API
-
-To use the Safe Browsing feature, you'll need to:
-
-1. Enable the Safe Browsing API in Google Cloud Console
-2. Create API credentials
-3. Configure the credentials in your environment
 
 ## Deployment
 
@@ -202,21 +187,6 @@ curl -X POST https://your-api-gateway-url/api/v1/shorten \
 curl -X GET https://your-api-gateway-url/api/v1/abc123
 ```
 
-## Database Schema
-
-### URLs Table
-
-- **PK**: `{shortCode}` - Primary key
-- **GSI1PK**: `{fullURL}` - Global Secondary Index for URL lookup
-- **GSI2PK**: `{userId}` - Global Secondary Index for user URL listing
-- **ttl**: Time-to-live for automatic cleanup
-
-### Analytics Table
-
-- **PK**: `{shortCode}` or `{userId}` - Primary key
-- **GSI1PK**: `{userId}` - Global Secondary Index for user analytics
-- **ttl**: Time-to-live for automatic cleanup
-
 ## Security Features
 
 - **JWT Authentication**: Secure token-based authentication
@@ -239,10 +209,6 @@ curl -X GET https://your-api-gateway-url/api/v1/abc123
 3. Commit your changes: `git commit -am 'Add new feature'`
 4. Push to the branch: `git push origin feature/new-feature`
 5. Submit a pull request
-
-## License
-
-This project is licensed under the ISC License.
 
 ## Support
 
